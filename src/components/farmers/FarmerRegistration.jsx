@@ -16,9 +16,9 @@ import {
 import Grid from '@mui/material/Grid';
 import { X, UserPlus, MapPin, Phone, Home, Edit } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '../services/api';
-import AnimatedButton from './animations/AnimatedButton';
-import MotionPaper from './animations/MotionPaper';
+import api from '../../services/api';
+import AnimatedButton from '../animations/AnimatedButton';
+import MotionPaper from '../animations/MotionPaper';
 
 const INDIAN_STATES = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',

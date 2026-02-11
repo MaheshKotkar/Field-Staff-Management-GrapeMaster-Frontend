@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { X, User, Phone, MapPin, Calendar, Clock, Clipboard } from 'lucide-react';
 import { motion } from 'framer-motion';
-import MotionPaper from './animations/MotionPaper';
+import MotionPaper from '../animations/MotionPaper';
 
 const FarmerProfileModal = ({ open, onClose, farmer, visits = [] }) => {
     if (!farmer) return null;
