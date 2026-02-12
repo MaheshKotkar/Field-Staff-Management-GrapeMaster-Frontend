@@ -26,12 +26,12 @@ import Grid from '@mui/material/Grid';
 import { Search, Calendar, MapPin, ClipboardList, X, Info } from 'lucide-react';
 import api from '../../services/api';
 import MainLayout from '../../components/layout/MainLayout';
+import NotificationBell from '../../components/layout/NotificationBell';
 import AnimatedCard from '../../components/animations/AnimatedCard';
 
 const AdminReports = () => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
     const [selectedReport, setSelectedReport] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
 
@@ -61,10 +61,7 @@ const AdminReports = () => {
         fetchReports();
     }, []);
 
-    const filteredReports = reports.filter(report =>
-        report.consultant?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.summary?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredReports = reports;
 
     if (loading) {
         return (
@@ -96,20 +93,9 @@ const AdminReports = () => {
                     <Typography variant="h5" fontWeight="900">Staff Daily Reports</Typography>
                     <Typography variant="caption" color="text.secondary">Review End-of-Day submissions from consulting staff</Typography>
                 </Box>
-                <TextField
-                    size="small"
-                    placeholder="Search by staff or summary..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    sx={{ width: { xs: '100%', md: 300 } }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search size={18} />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                <Box display="flex" alignItems="center" gap={1.5}>
+                    <NotificationBell />
+                </Box>
             </Box>
 
             <Container maxWidth="xl" sx={{ mt: { xs: 2, md: 4 }, pb: 6 }}>
@@ -309,7 +295,7 @@ const AdminReports = () => {
             >
                 {selectedReport && (
                     <>
-                        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+                        <DialogTitle component="div" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
                             <Box display="flex" alignItems="center" gap={1.5}>
                                 <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>
                                     <Info size={18} />

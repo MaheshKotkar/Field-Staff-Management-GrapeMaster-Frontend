@@ -38,9 +38,11 @@ import {
     Plus,
     Check,
     SortAsc,
-    SortDesc
+    SortDesc,
+    X
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
+import NotificationBell from '../../components/layout/NotificationBell';
 import api from '../../services/api';
 import AnimatedCard from '../../components/animations/AnimatedCard';
 import AnimatedButton from '../../components/animations/AnimatedButton';
@@ -50,7 +52,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+import { useAuth } from '../../context/AuthContext';
+
 const VisitsList = () => {
+    const { user } = useAuth();
     const theme = useTheme();
     const [visits, setVisits] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,6 +64,15 @@ const VisitsList = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
     const [dateSort, setDateSort] = useState('newest');
+    const [detailVisit, setDetailVisit] = useState(null);
+
+    const handleOpenDetail = (visit) => {
+        setDetailVisit(visit);
+    };
+
+    const handleCloseDetail = () => {
+        setDetailVisit(null);
+    };
 
     const fetchVisits = async () => {
         try {
@@ -166,6 +180,7 @@ const VisitsList = () => {
                         >
                             <Filter size={20} color={anchorEl ? theme.palette.primary.main : "#64748b"} />
                         </IconButton>
+                        {user?.role === 'admin' && <NotificationBell />}
 
                         <Menu
                             anchorEl={anchorEl}
@@ -302,8 +317,18 @@ const VisitsList = () => {
                                                         <Stethoscope size={16} color="#7c4dff" />
                                                         <Typography variant="subtitle2" fontWeight="700">Recommendations</Typography>
                                                     </Box>
-                                                    <Typography variant="body2" color="text.secondary" noWrap>F: {visit.recommendation?.fertilizer || 'None'}</Typography>
-                                                    <Typography variant="body2" color="text.secondary" noWrap>P: {visit.recommendation?.pesticide || 'None'}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap',
+                                                        maxWidth: '100%'
+                                                    }}>F: {visit.recommendation?.fertilizer || 'None'}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap',
+                                                        maxWidth: '100%'
+                                                    }}>P: {visit.recommendation?.pesticide || 'None'}</Typography>
                                                 </Grid>
                                                 <Grid size={{ xs: 12, sm: 4 }}>
                                                     <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -312,12 +337,28 @@ const VisitsList = () => {
                                                     </Box>
                                                     <Typography variant="body2" color="text.secondary" sx={{
                                                         display: '-webkit-box',
-                                                        WebkitLineClamp: 2,
+                                                        WebkitLineClamp: 1,
                                                         WebkitBoxOrient: 'vertical',
                                                         overflow: 'hidden'
                                                     }}>
                                                         {visit.remarks || 'No remarks provided.'}
                                                     </Typography>
+                                                    <Button
+                                                        size="small"
+                                                        onClick={() => handleOpenDetail(visit)}
+                                                        sx={{
+                                                            mt: 0.5,
+                                                            p: 0,
+                                                            minWidth: 'auto',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 700,
+                                                            color: 'primary.main',
+                                                            textTransform: 'none',
+                                                            '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+                                                        }}
+                                                    >
+                                                        View Full Details
+                                                    </Button>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -347,6 +388,81 @@ const VisitsList = () => {
                         }} />
                     </Container>
                 </Box>
+            </Dialog>
+
+            {/* Visit Details Modal */}
+            <Dialog
+                open={Boolean(detailVisit)}
+                onClose={handleCloseDetail}
+                maxWidth="sm"
+                fullWidth
+                disableRestoreFocus
+                PaperProps={{ sx: { borderRadius: 4, p: 1 } }}
+            >
+                {detailVisit && (
+                    <>
+                        <DialogTitle component="div" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box display="flex" alignItems="center" gap={1.5}>
+                                <Box sx={{ p: 1, bgcolor: 'primary.50', color: 'primary.main', borderRadius: 2, display: 'flex' }}>
+                                    <Clipboard size={24} />
+                                </Box>
+                                <Typography variant="h6" fontWeight="800">Visit Details</Typography>
+                            </Box>
+                            <IconButton onClick={handleCloseDetail}><X size={20} /></IconButton>
+                        </DialogTitle>
+                        <DialogContent sx={{ p: 3 }}>
+                            <Grid container spacing={3}>
+                                <Grid size={12}>
+                                    <Box display="flex" alignItems="center" gap={2} mb={3}>
+                                        <Avatar sx={{ bgcolor: 'secondary.main', color: 'white' }}>
+                                            <User size={24} />
+                                        </Avatar>
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight="800">{detailVisit.farmer?.name}</Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Visit Date: {new Date(detailVisit.visitDate).toLocaleDateString()}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+
+                                <Grid size={12}>
+                                    <Typography variant="subtitle2" fontWeight="800" color="primary.main" gutterBottom>
+                                        FERTILIZER RECOMMENDATION
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2, mb: 3 }}>
+                                        {detailVisit.recommendation?.fertilizer || 'None recorded'}
+                                    </Typography>
+
+                                    <Typography variant="subtitle2" fontWeight="800" color="secondary.main" gutterBottom>
+                                        PESTICIDE RECOMMENDATION
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2, mb: 3 }}>
+                                        {detailVisit.recommendation?.pesticide || 'None recorded'}
+                                    </Typography>
+
+                                    <Typography variant="subtitle2" fontWeight="800" color="text.primary" gutterBottom>
+                                        GENERAL REMARKS
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                                        {detailVisit.remarks || 'No remarks provided'}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </DialogContent>
+                        <DialogActions sx={{ p: 3 }}>
+                            <Button
+                                onClick={handleCloseDetail}
+                                variant="contained"
+                                fullWidth
+                                autoFocus
+                                sx={{ borderRadius: 2, py: 1.2, fontWeight: 700 }}
+                            >
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </>
+                )}
             </Dialog>
         </MainLayout>
     );

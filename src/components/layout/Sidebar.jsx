@@ -84,6 +84,7 @@ const NavItem = ({ icon: Icon, label, path, expanded, active }) => {
 const Sidebar = () => {
     const [expanded, setExpanded] = useState(true);
     const location = useLocation();
+    const navigate = useNavigate();
     const { user, logout } = useAuth();
 
     const menuItems = [
@@ -115,7 +116,11 @@ const Sidebar = () => {
 
     return (
         <motion.div
-            animate={{ width: expanded ? 240 : 80 }}
+            animate={{
+                width: expanded ? 240 : 80,
+                minWidth: expanded ? 240 : 80,
+                maxWidth: expanded ? 240 : 80
+            }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             style={{
                 backgroundColor: 'white',
@@ -125,7 +130,9 @@ const Sidebar = () => {
                 top: 0,
                 display: 'flex',
                 flexDirection: 'column',
-                overflowX: 'hidden'
+                overflowX: 'hidden',
+                flexShrink: 0,
+                zIndex: 1000
             }}
         >
             <Box sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', justifyContent: expanded ? 'flex-start' : 'center', gap: 2 }}>

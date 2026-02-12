@@ -9,7 +9,8 @@ import {
     Divider,
     CircularProgress,
     Alert,
-    Snackbar
+    Snackbar,
+    Grid
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, ClipboardCheck, Send } from 'lucide-react';
@@ -103,7 +104,7 @@ const DailySummary = () => {
                     </Box>
 
                     <Grid container spacing={3} mb={4}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <AnimatedCard delay={0.1}>
                                 <Box sx={{ p: 3, textAlign: 'center' }}>
                                     <Box sx={{ p: 1.5, bgcolor: 'primary.50', color: 'primary.main', borderRadius: 3, display: 'inline-flex', mb: 2 }}>
@@ -114,7 +115,7 @@ const DailySummary = () => {
                                 </Box>
                             </AnimatedCard>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <AnimatedCard delay={0.2}>
                                 <Box sx={{ p: 3, textAlign: 'center' }}>
                                     <Box sx={{ p: 1.5, bgcolor: 'secondary.50', color: 'secondary.main', borderRadius: 3, display: 'inline-flex', mb: 2 }}>
@@ -201,23 +202,5 @@ const DailySummary = () => {
     );
 };
 
-// Internal Grid for layout since we use mui grid elsewhere and standard layout is desired
-const Grid = ({ children, container, item, xs, sm, spacing, mb }) => (
-    <Box
-        sx={{
-            display: container ? 'flex' : 'block',
-            flexWrap: container ? 'wrap' : 'nowrap',
-            gap: container ? (spacing || 0) * 8 + 'px' : 0,
-            mb: mb || 0,
-            width: item ? {
-                xs: (xs / 12) * 100 + '%',
-                sm: (sm / 12) * 100 + '%'
-            } : 'auto',
-            ...(item && { flexBasis: { xs: (xs / 12) * 100 + '%', sm: (sm / 12) * 100 + '%' }, flexGrow: 0, maxWidth: { xs: (xs / 12) * 100 + '%', sm: (sm / 12) * 100 + '%' } })
-        }}
-    >
-        {children}
-    </Box>
-);
 
 export default DailySummary;

@@ -21,6 +21,7 @@ import {
     Github
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Footer = () => {
     const theme = useTheme();
@@ -75,36 +76,31 @@ const Footer = () => {
                     </Grid>
 
                     {/* Quick Links */}
-                    <Grid size={{ xs: 6, md: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="800" mb={3}>Product</Typography>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Typography variant="subtitle1" fontWeight="800" mb={3}>Quick Links</Typography>
                         <Stack spacing={2}>
-                            {['Features', 'Analytics', 'Mobile App', 'Security'].map((link) => (
+                            <Link
+                                href="/"
+                                underline="none"
+                                color="text.secondary"
+                                sx={{ '&:hover': { color: 'primary.main' } }}
+                            >
+                                Home
+                            </Link>
+                            {[
+                                { name: 'About Us', path: '/about' },
+                                { name: 'Contact Us', path: '/contact' },
+                                { name: 'Admin Portal', path: '/admin/login' }
+                            ].map((link) => (
                                 <Link
-                                    key={link}
-                                    href="#"
+                                    key={link.name}
+                                    component={RouterLink}
+                                    to={link.path}
                                     underline="none"
                                     color="text.secondary"
                                     sx={{ '&:hover': { color: 'primary.main' } }}
                                 >
-                                    {link}
-                                </Link>
-                            ))}
-                        </Stack>
-                    </Grid>
-
-                    {/* Resources */}
-                    <Grid size={{ xs: 6, md: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="800" mb={3}>Company</Typography>
-                        <Stack spacing={2}>
-                            {['About Us', 'Sustainability', 'Admin Portal', 'Terms'].map((link) => (
-                                <Link
-                                    key={link}
-                                    href={link === 'Admin Portal' ? '/admin/login' : '#'}
-                                    underline="none"
-                                    color="text.secondary"
-                                    sx={{ '&:hover': { color: 'primary.main' } }}
-                                >
-                                    {link}
+                                    {link.name}
                                 </Link>
                             ))}
                         </Stack>
@@ -114,22 +110,22 @@ const Footer = () => {
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Typography variant="subtitle1" fontWeight="800" mb={3}>Contact Info</Typography>
                         <Stack spacing={3}>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <MapPin size={20} color={theme.palette.primary.main} />
-                                <Typography variant="body2" color="text.secondary">
-                                    123 Vineyard Lane, Agri Valley, California 90210
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                                <MapPin size={24} color={theme.palette.primary.main} style={{ flexShrink: 0, marginTop: '4px' }} />
+                                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                                    Flat No 204, Padmalaya Apartment, Lane No 1, New Pandit Colony, Sharanpur Road, Nashik, Maharashtra - 422002
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Phone size={20} color={theme.palette.primary.main} />
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Phone size={24} color={theme.palette.primary.main} style={{ flexShrink: 0 }} />
                                 <Typography variant="body2" color="text.secondary">
-                                    +1 (555) 000-1111
+                                    +91 7972371656
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Mail size={20} color={theme.palette.primary.main} />
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Mail size={24} color={theme.palette.primary.main} style={{ flexShrink: 0 }} />
                                 <Typography variant="body2" color="text.secondary">
-                                    support@grapemaster.com
+                                    admin@grapemaster.org
                                 </Typography>
                             </Box>
                         </Stack>

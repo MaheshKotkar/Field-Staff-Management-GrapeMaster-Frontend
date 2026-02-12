@@ -107,7 +107,7 @@ const FarmerRegistration = ({ open, onClose, onSuccess, farmer = null }) => {
                 sx: { borderRadius: 4, p: 1 }
             }}
         >
-            <DialogTitle sx={{ m: 0, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <DialogTitle component="div" sx={{ m: 0, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box display="flex" alignItems="center" gap={1.5}>
                     <Box sx={{ p: 1, bgcolor: 'primary.50', color: 'primary.main', borderRadius: 2, display: 'flex' }}>
                         <UserPlus size={24} />

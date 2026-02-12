@@ -100,7 +100,7 @@ const Landing = () => {
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'white', overflowX: 'hidden' }}>
-            <PublicNavbar />
+            <PublicNavbar showAbout={true} />
 
             {/* Hero Section */}
             <Box
@@ -349,7 +349,7 @@ const Landing = () => {
                             { label: 'Verification Accuracy', value: '99', suffix: '%' },
                             { label: 'Regional Coverage', value: '24', suffix: ' Districts' }
                         ].map((stat, i) => (
-                            <Grid item xs={6} md={3} key={i}>
+                            <Grid size={{ xs: 6, md: 3 }} key={i}>
                                 <Box textAlign="center">
                                     <Typography variant="h3" fontWeight="900" color="primary.main" gutterBottom sx={{ fontSize: { xs: '2.4rem', md: '3.5rem' } }}>
                                         <Counter value={stat.value} suffix={stat.suffix} delay={i * 0.1} />

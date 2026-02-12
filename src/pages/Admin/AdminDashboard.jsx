@@ -11,8 +11,6 @@ import {
     TableBody,
     TableCell,
     TableHead,
-    TableRow,
-    Avatar,
     Paper,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -26,7 +24,7 @@ import {
     Map,
     BarChart3,
     Activity,
-    ClipboardList
+    ClipboardList,
 } from 'lucide-react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
@@ -44,6 +42,7 @@ import {
 } from 'chart.js';
 import api from '../../services/api';
 import MainLayout from '../../components/layout/MainLayout';
+import NotificationBell from '../../components/layout/NotificationBell';
 import AnimatedCard from '../../components/animations/AnimatedCard';
 import AnimatedButton from '../../components/animations/AnimatedButton';
 import { useNavigate } from 'react-router-dom';
@@ -176,7 +175,8 @@ const AdminDashboard = () => {
                     <Typography variant="h5" fontWeight="900">Admin Portal</Typography>
                     <Typography variant="caption" color="text.secondary">Corporate Oversight & Analytics</Typography>
                 </Box>
-                <Box display="flex" justifyContent={{ xs: 'center', md: 'flex-end' }} gap={2}>
+                <Box display="flex" justifyContent={{ xs: 'center', md: 'flex-end' }} alignItems="center" gap={2} flexWrap="wrap">
+                    <NotificationBell />
                     <AnimatedButton
                         variant="outlined"
                         onClick={() => navigate('/admin/reports')}

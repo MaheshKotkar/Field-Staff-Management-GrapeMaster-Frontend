@@ -38,10 +38,13 @@ import MainLayout from '../../components/layout/MainLayout';
 import api from '../../services/api';
 import AnimatedCard from '../../components/animations/AnimatedCard';
 import AnimatedButton from '../../components/animations/AnimatedButton';
+import NotificationBell from '../../components/layout/NotificationBell';
 import FarmerRegistration from '../../components/farmers/FarmerRegistration';
 import FarmerProfileModal from '../../components/farmers/FarmerProfileModal';
+import { useAuth } from '../../context/AuthContext';
 
 const FarmersList = () => {
+    const { user } = useAuth();
     const theme = useTheme();
     const [farmers, setFarmers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -168,6 +171,7 @@ const FarmersList = () => {
                         <IconButton sx={{ bgcolor: 'grey.50', borderRadius: 2.5, border: '1px solid #e2e8f0' }}>
                             <Filter size={20} color="#64748b" />
                         </IconButton>
+                        {user?.role === 'admin' && <NotificationBell />}
                         <AnimatedButton
                             variant="contained"
                             startIcon={<Plus size={20} />}

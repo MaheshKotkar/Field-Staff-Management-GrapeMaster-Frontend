@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://field-staff-management-grapemaster-1in1.onrender.com/api',
+    baseURL: window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api'
+        : 'https://field-staff-management-grapemaster-1in1.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
     },

@@ -21,7 +21,6 @@ import {
     Calendar,
     TrendingUp,
     MapPin,
-    Bell,
     Search,
     Plus,
     PlusCircle,
@@ -79,6 +78,7 @@ const Dashboard = () => {
         loading: true
     });
     const [recentVisits, setRecentVisits] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchData = async () => {
         try {
@@ -123,6 +123,13 @@ const Dashboard = () => {
         }
     };
 
+    const filteredVisits = recentVisits.filter(v =>
+        v.farmer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.remarks?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.cropType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        v.locationAddress?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -147,9 +154,14 @@ const Dashboard = () => {
                 <Box display="flex" alignItems="center" gap={1.5}>
                     <Box sx={{ display: { xs: 'none', lg: 'flex' }, bgcolor: 'grey.100', borderRadius: 3, px: 2, py: 1, alignItems: 'center', gap: 1 }}>
                         <Search size={18} color="#64748b" />
-                        <Box component="input" placeholder="Search data..." sx={{ border: 'none', bgcolor: 'transparent', outline: 'none', fontSize: '14px', width: 150 }} />
+                        <Box
+                            component="input"
+                            placeholder="Search activity..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            sx={{ border: 'none', bgcolor: 'transparent', outline: 'none', fontSize: '14px', width: 150 }}
+                        />
                     </Box>
-                    <IconButton size="large" sx={{ display: { xs: 'none', sm: 'flex' } }}><Bell size={22} /></IconButton>
                     <AnimatedButton
                         variant="outlined"
                         startIcon={<PlusCircle size={20} />}
@@ -189,11 +201,7 @@ const Dashboard = () => {
                         <Typography variant="h3" fontWeight="900" sx={{ mb: 1 }}>Hello, {user?.name || 'Mahesh'}!</Typography>
                         <Typography variant="h6" color="text.secondary" fontWeight="400">Everything looks great on the field today.</Typography>
                     </motion.div>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton onClick={() => setOpenStepper(true)} sx={{ bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}>
-                            <Plus size={24} />
-                        </IconButton>
-                    </Box>
+
                 </Box>
 
                 {/* Stats Grid */}
@@ -255,57 +263,16 @@ const Dashboard = () => {
                                 </Box>
                                 <AnimatedButton variant="outlined" size="small">Export Data</AnimatedButton>
                             </Box>
-                            <AdminAnalytics visits={recentVisits} />
+                            <AdminAnalytics visits={filteredVisits} />
                         </AnimatedCard>
 
-                        <Grid container spacing={3}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <AnimatedCard delay={0.6} sx={{ p: 3 }}>
-                                    <Typography variant="subtitle1" fontWeight="800" mb={3}>Upload Media</Typography>
-                                    <ImageUpload />
-                                </AnimatedCard>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <AnimatedCard delay={0.7} sx={{ p: 3 }}>
-                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                                        <Typography variant="subtitle1" fontWeight="800">Quick Actions</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        {[
-                                            { label: 'Register New Farmer', color: '#64dd17', action: () => setOpenFarmerReg(true) },
-                                            user?.role === 'staff' && { label: 'Submit Daily Summary', color: '#fbbf24', action: () => navigate('/daily-summary') },
-                                            { label: 'View Weather Forecast', color: '#7c4dff', action: () => { } },
-                                            { label: 'Sync Offline Data', color: '#64dd17', action: () => { } }
-                                        ].filter(Boolean).map((btn, i) => (
-                                            <motion.div key={i} whileHover={{ x: 8 }} transition={{ type: 'spring' }}>
-                                                <Button
-                                                    fullWidth
-                                                    onClick={btn.action}
-                                                    sx={{
-                                                        justifyContent: 'space-between',
-                                                        bgcolor: 'grey.50',
-                                                        color: 'text.primary',
-                                                        p: 2,
-                                                        borderRadius: 3,
-                                                        '&:hover': { bgcolor: 'primary.50', color: 'primary.main' }
-                                                    }}
-                                                    endIcon={<ArrowRight size={18} />}
-                                                >
-                                                    {btn.label}
-                                                </Button>
-                                            </motion.div>
-                                        ))}
-                                    </Box>
-                                </AnimatedCard>
-                            </Grid>
-                        </Grid>
                     </Grid>
 
                     {/* Activity Timeline */}
                     <Grid size={{ xs: 12, lg: 4 }}>
                         <AnimatedCard delay={0.6} sx={{ p: 4, height: '100%' }}>
                             <Typography variant="h6" fontWeight="800" mb={4}>Recent Activity</Typography>
-                            <TimelineView visits={recentVisits} loading={stats.loading} />
+                            <TimelineView visits={filteredVisits} loading={stats.loading} />
                             <AnimatedButton fullWidth variant="text" color="secondary" sx={{ mt: 2 }}>
                                 View All Activity
                             </AnimatedButton>

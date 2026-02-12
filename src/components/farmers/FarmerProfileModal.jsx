@@ -33,7 +33,7 @@ const FarmerProfileModal = ({ open, onClose, farmer, visits = [] }) => {
                 sx: { borderRadius: 4 }
             }}
         >
-            <DialogTitle sx={{ m: 0, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <DialogTitle component="div" sx={{ m: 0, p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h6" fontWeight="800">Farmer Profile</Typography>
                 <IconButton onClick={onClose}><X size={20} /></IconButton>
             </DialogTitle>

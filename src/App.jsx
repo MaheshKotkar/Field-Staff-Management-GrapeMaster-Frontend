@@ -17,6 +17,8 @@ const VisitsList = lazy(() => import('./pages/FarmVisits/VisitsList'));
 const SettingsPage = lazy(() => import('./pages/Settings/Settings'));
 const DailySummary = lazy(() => import('./pages/Dashboard/DailySummary'));
 const AdminReports = lazy(() => import('./pages/Admin/AdminReports'));
+const AboutUs = lazy(() => import('./pages/AboutUs/AboutUs'));
+const ContactUs = lazy(() => import('./pages/ContactUs/ContactUs'));
 
 const App = () => {
     return (
@@ -94,6 +96,8 @@ const App = () => {
                             </ProtectedAdminRoute>
                         }
                     />
+                    <Route path="/about" element={<AboutUs />} />
+                    <Route path="/contact" element={<ContactUs />} />
                     <Route path="/" element={<Landing />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

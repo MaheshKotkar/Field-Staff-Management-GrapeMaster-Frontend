@@ -23,7 +23,10 @@ import {
     Divider,
     Grid,
     Snackbar,
-    Alert
+    Alert,
+    DialogTitle,
+    DialogActions,
+    Button
 } from '@mui/material';
 import {
     Check,
@@ -49,10 +52,10 @@ const VerificationManager = () => {
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const [loading, setLoading] = useState(true);
     const [visits, setVisits] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [previewImage, setPreviewImage] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [rejectionDialog, setRejectionDialog] = useState({ open: false, id: null, reason: '' });
 
     const fetchVisits = async () => {
         try {
@@ -97,14 +100,20 @@ const VerificationManager = () => {
         document.body.removeChild(link);
     };
 
-    const handleUpdateStatus = async (id, status) => {
+    const handleUpdateStatus = async (id, status, reason = '') => {
+        if (status === 'rejected' && !rejectionDialog.open) {
+            setRejectionDialog({ open: true, id, reason: '' });
+            return;
+        }
+
         try {
-            await api.patch(`/admin/visits/${id}/verify`, { status });
+            await api.patch(`/admin/visits/${id}/verify`, { status, rejectionReason: reason });
             setSnackbar({
                 open: true,
                 message: `Report ${status === 'verified' ? 'verified' : 'rejected'} successfully!`,
                 severity: status === 'verified' ? 'success' : 'error'
             });
+            setRejectionDialog({ open: false, id: null, reason: '' });
             fetchVisits();
         } catch (error) {
             console.error('Error updating status:', error);
@@ -121,19 +130,8 @@ const VerificationManager = () => {
     }, []);
 
     const filteredVisits = Array.isArray(visits) ? visits.filter(visit => {
-        const consultantName = visit?.consultant?.name?.toLowerCase() || '';
-        const farmerName = visit?.farmer?.name?.toLowerCase() || '';
-        const villageName = visit?.farmer?.village?.toLowerCase() || '';
-        const search = searchTerm.toLowerCase();
-
-        const matchesSearch =
-            consultantName.includes(search) ||
-            farmerName.includes(search) ||
-            villageName.includes(search);
-
         const matchesStatus = statusFilter === 'all' || visit.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
+        return matchesStatus;
     }) : [];
 
     const getStatusChip = (status) => {
@@ -164,15 +162,15 @@ const VerificationManager = () => {
             <Divider sx={{ mb: 2, borderStyle: 'dashed' }} />
 
             <Grid container spacing={2} mb={2}>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                     <Typography variant="caption" color="text.secondary" display="block">Consultant</Typography>
                     <Typography variant="body2" fontWeight="700" noWrap>{visit?.consultant?.name || 'Unknown'}</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                     <Typography variant="caption" color="text.secondary" display="block">Farmer</Typography>
                     <Typography variant="body2" fontWeight="700" noWrap>{visit?.farmer?.name || 'Unknown'}</Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <Box display="flex" alignItems="center" gap={0.5}>
                         <MapPin size={14} color="#64748b" />
                         <Typography variant="caption" color="text.secondary" noWrap>
@@ -196,30 +194,30 @@ const VerificationManager = () => {
                 </Box>
             )}
 
-            <Box display="flex" gap={1}>
-                <AnimatedButton
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    color="success"
-                    onClick={() => handleUpdateStatus(visit._id, 'verified')}
-                    disabled={visit.status === 'verified'}
-                    startIcon={<Check size={16} />}
-                >
-                    Verify
-                </AnimatedButton>
-                <AnimatedButton
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleUpdateStatus(visit._id, 'rejected')}
-                    disabled={visit.status === 'rejected'}
-                    startIcon={<X size={16} />}
-                >
-                    Reject
-                </AnimatedButton>
-            </Box>
+            {visit.status === 'pending' && (
+                <Box display="flex" gap={1}>
+                    <AnimatedButton
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        color="success"
+                        onClick={() => handleUpdateStatus(visit._id, 'verified')}
+                        startIcon={<Check size={16} />}
+                    >
+                        Verify
+                    </AnimatedButton>
+                    <AnimatedButton
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleUpdateStatus(visit._id, 'rejected')}
+                        startIcon={<X size={16} />}
+                    >
+                        Reject
+                    </AnimatedButton>
+                </Box>
+            )}
         </AnimatedCard>
     );
 
@@ -240,22 +238,6 @@ const VerificationManager = () => {
                     Verification Center
                 </Typography>
                 <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={1.5}>
-                    <TextField
-                        size="small"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        fullWidth
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <Box sx={{ mr: 1, display: 'flex' }}>
-                                        <Search size={18} color="#64748b" />
-                                    </Box>
-                                )
-                            }
-                        }}
-                    />
                     <Box display="flex" gap={1.5}>
                         <TextField
                             select
@@ -363,14 +345,22 @@ const VerificationManager = () => {
                                                 </TableCell>
                                                 <TableCell>{getStatusChip(visit.status)}</TableCell>
                                                 <TableCell align="right">
-                                                    <Box display="flex" justifyContent="flex-end" gap={0.5}>
-                                                        <IconButton size="small" onClick={() => handleUpdateStatus(visit._id, 'verified')} disabled={visit.status === 'verified'} color="success">
-                                                            <Check size={18} />
-                                                        </IconButton>
-                                                        <IconButton size="small" onClick={() => handleUpdateStatus(visit._id, 'rejected')} disabled={visit.status === 'rejected'} color="error">
-                                                            <X size={18} />
-                                                        </IconButton>
-                                                    </Box>
+                                                    {visit.status === 'pending' ? (
+                                                        <Box display="flex" justifyContent="flex-end" gap={0.5}>
+                                                            <IconButton size="small" onClick={() => handleUpdateStatus(visit._id, 'verified')} color="success">
+                                                                <Check size={18} />
+                                                            </IconButton>
+                                                            <IconButton size="small" onClick={() => handleUpdateStatus(visit._id, 'rejected')} color="error">
+                                                                <X size={18} />
+                                                            </IconButton>
+                                                        </Box>
+                                                    ) : (
+                                                        <Box display="flex" justifyContent="flex-end">
+                                                            <Typography variant="caption" color="text.disabled" fontWeight="600">
+                                                                PROCESSED
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -390,6 +380,57 @@ const VerificationManager = () => {
                     </>
                 )}
             </Container>
+
+            {/* Rejection Reason Dialog */}
+            <Dialog
+                open={rejectionDialog.open}
+                onClose={() => setRejectionDialog({ ...rejectionDialog, open: false })}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: { borderRadius: 4, p: 1 }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800 }}>Reject Verification</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" color="text.secondary" mb={2}>
+                        Please providing a reason for rejecting this visit session. This will be stored for record-keeping.
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        multiline
+                        rows={3}
+                        variant="outlined"
+                        placeholder="e.g., Incomplete photos, incorrect location, or missing crop details..."
+                        value={rejectionDialog.reason}
+                        onChange={(e) => setRejectionDialog({ ...rejectionDialog, reason: e.target.value })}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 3,
+                                bgcolor: 'grey.50'
+                            }
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ p: 2, gap: 1 }}>
+                    <Button
+                        onClick={() => setRejectionDialog({ ...rejectionDialog, open: false })}
+                        sx={{ borderRadius: 2, fontWeight: 700, color: 'text.secondary' }}
+                    >
+                        Cancel
+                    </Button>
+                    <AnimatedButton
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleUpdateStatus(rejectionDialog.id, 'rejected', rejectionDialog.reason)}
+                        disabled={!rejectionDialog.reason.trim()}
+                        sx={{ borderRadius: 2, px: 3 }}
+                    >
+                        Confirm Rejection
+                    </AnimatedButton>
+                </DialogActions>
+            </Dialog>
 
             {/* Image Preview Dialog */}
             <Dialog
