@@ -106,10 +106,11 @@ const Sidebar = () => {
 
     const handleLogout = () => {
         const isAdmin = user?.role === 'admin';
-        logout();
         if (isAdmin) {
             navigate('/');
+            setTimeout(() => logout(), 0);
         } else {
+            logout();
             navigate('/login');
         }
     };

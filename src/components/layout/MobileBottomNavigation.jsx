@@ -7,7 +7,7 @@ import {
     useTheme
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Home, Users, Calendar, BarChart3, ClipboardCheck } from 'lucide-react';
+import { Home, Users, Calendar, BarChart3, ClipboardCheck, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -15,7 +15,18 @@ const MobileBottomNavigation = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+        const isAdmin = user?.role === 'admin';
+        if (isAdmin) {
+            navigate('/');
+            setTimeout(() => logout(), 0);
+        } else {
+            logout();
+            navigate('/login');
+        }
+    };
 
     const getValue = () => {
         if (location.pathname.includes('dashboard')) return 0;
@@ -39,6 +50,8 @@ const MobileBottomNavigation = () => {
         menuItems.push({ icon: BarChart3, label: 'Admin', path: '/admin' });
     }
 
+    menuItems.push({ icon: LogOut, label: 'Logout', path: 'logout' });
+
     return (
         <Paper
             sx={{
@@ -61,7 +74,12 @@ const MobileBottomNavigation = () => {
                 showLabels
                 value={getValue()}
                 onChange={(event, newValue) => {
-                    navigate(menuItems[newValue].path);
+                    const item = menuItems[newValue];
+                    if (item.label === 'Logout') {
+                        handleLogout();
+                    } else {
+                        navigate(item.path);
+                    }
                 }}
                 sx={{ bgcolor: 'transparent', height: 70 }}
             >

@@ -13,7 +13,6 @@ import {
     TextField,
     Alert,
     CircularProgress,
-    Snackbar
 } from '@mui/material';
 import Grid2 from '@mui/material/Grid';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -76,7 +75,6 @@ const ContactUs = () => {
     });
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: '', message: '' });
-    const [showSnackbar, setShowSnackbar] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -92,7 +90,6 @@ const ContactUs = () => {
             if (response.data.success) {
                 setStatus({ type: 'success', message: response.data.message });
                 setFormData({ name: '', email: '', subject: '', message: '' });
-                setShowSnackbar(true);
             }
         } catch (err) {
             setStatus({
@@ -334,16 +331,6 @@ const ContactUs = () => {
                 </Grid2>
             </Container>
 
-            <Snackbar
-                open={showSnackbar}
-                autoHideDuration={6000}
-                onClose={() => setShowSnackbar(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setShowSnackbar(false)} severity="success" sx={{ width: '100%', borderRadius: 2, fontWeight: 600 }}>
-                    Message received! We'll be in touch.
-                </Alert>
-            </Snackbar>
         </Box>
     );
 };
