@@ -108,8 +108,8 @@ const Landing = () => {
                     minHeight: '100vh',
                     display: 'flex',
                     alignItems: 'center',
-                    pt: { xs: 15, md: 18 }, // Reduced from 28 to 18 to prevent cutoff
-                    pb: { xs: 10, md: 12 }, // Reduced from 22 to 12
+                    pt: { xs: 8, md: 18 }, // Reduced xs padding from 15 to 8 to fix large gap
+                    pb: { xs: 8, md: 12 }, // Reduced xs padding
                     background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 40%, #f5f3ff 100%)',
                     position: 'relative',
                     overflow: 'hidden'
@@ -250,7 +250,7 @@ const Landing = () => {
                                 <Stack
                                     direction={{ xs: 'column', sm: 'row' }}
                                     spacing={3}
-                                    sx={{ mt: 2, width: { xs: '100%', sm: 'auto' } }}
+                                    sx={{ mt: 2, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'center', md: 'flex-start' } }} // Centered on mobile
                                 >
                                     <AnimatedButton
                                         variant="contained"
