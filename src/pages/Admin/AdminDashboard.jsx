@@ -12,6 +12,17 @@ import {
     TableCell,
     TableHead,
     Paper,
+    TableRow,
+    Avatar,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button,
+    IconButton,
+    Alert,
+    Snackbar,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { motion } from 'framer-motion';
@@ -25,6 +36,7 @@ import {
     BarChart3,
     Activity,
     ClipboardList,
+    Trash2,
 } from 'lucide-react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
@@ -95,6 +107,54 @@ const AdminDashboard = () => {
     useEffect(() => {
         fetchMetrics();
     }, []);
+
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return;
+
+        try {
+            await api.delete(`/admin/users/${userToDelete._id}`);
+
+            // Update local state
+            setMetrics(prev => ({
+                ...prev,
+                consultantStats: prev.consultantStats.filter(u => u._id !== userToDelete._id),
+                totals: {
+                    ...prev.totals,
+                    staff: Math.max(0, (prev.totals?.staff || 0) - 1)
+                }
+            }));
+
+            // Also remove from consultant activity if present
+            fetchMetrics(); // simpler to just refetch to get all derived stats correct
+
+            // Show success message
+            setSnackbar({
+                open: true,
+                message: 'Consultant deleted successfully',
+                severity: 'error' // User asked for "red alert", error severity is red in MUI
+            });
+
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            // You might want to show an error notification here
+        } finally {
+            setDeleteDialogOpen(false);
+            setUserToDelete(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -336,6 +396,7 @@ const AdminDashboard = () => {
                                             <TableCell sx={{ fontWeight: 800 }} align="center">Farmers</TableCell>
                                             <TableCell sx={{ fontWeight: 800 }} align="center">Avg. Recs</TableCell>
                                             <TableCell sx={{ fontWeight: 800 }} align="right">Last Active</TableCell>
+                                            <TableCell sx={{ fontWeight: 800 }} align="center">Actions</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -365,6 +426,15 @@ const AdminDashboard = () => {
                                                     <Typography variant="body2">
                                                         {staff.lastVisitDate ? new Date(staff.lastVisitDate).toLocaleDateString() : 'Never'}
                                                     </Typography>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <IconButton
+                                                        onClick={() => handleDeleteClick(staff)}
+                                                        color="error"
+                                                        size="small"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </IconButton>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -423,6 +493,46 @@ const AdminDashboard = () => {
                     </motion.div>
                 )}
             </Container>
+
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                PaperProps={{
+                    sx: { borderRadius: 3, p: 1 }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800 }}>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to remove <strong>{userToDelete?.name}</strong>?
+                        This action cannot be undone and will prevent them from accessing the system.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={() => setDeleteDialogOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }} autoFocus>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        variant="contained"
+                        color="error"
+                        sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
+                    >
+                        Delete Consultant
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%', fontWeight: 700 }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </MainLayout>
     );
 };

@@ -105,8 +105,11 @@ const Landing = () => {
             {/* Hero Section */}
             <Box
                 sx={{
-                    pt: { xs: 15, md: 28 },
-                    pb: { xs: 10, md: 22 },
+                    minHeight: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    pt: { xs: 15, md: 18 }, // Reduced from 28 to 18 to prevent cutoff
+                    pb: { xs: 10, md: 12 }, // Reduced from 22 to 12
                     background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 40%, #f5f3ff 100%)',
                     position: 'relative',
                     overflow: 'hidden'

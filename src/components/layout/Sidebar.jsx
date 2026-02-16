@@ -132,6 +132,7 @@ const Sidebar = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 overflowX: 'hidden',
+                overflowY: 'auto', // Enable vertical scrolling
                 flexShrink: 0,
                 zIndex: 1000
             }}

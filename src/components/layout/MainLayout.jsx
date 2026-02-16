@@ -11,9 +11,9 @@ const MainLayout = ({ children }) => {
     return (
         <Box sx={{
             display: 'flex',
-            minHeight: '100vh',
+            height: '100vh',
             bgcolor: 'background.default',
-            overflowX: 'hidden'
+            overflow: 'hidden'
         }}>
             {!isMobile && <Sidebar />}
 
@@ -23,10 +23,10 @@ const MainLayout = ({ children }) => {
                     flexShrink: 1,
                     width: '100%',
                     pb: isMobile ? '80px' : 0,
-                    minHeight: '100vh',
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    overflow: 'auto',
+                    overflowY: 'auto',
                     position: 'relative'
                 }}
             >
