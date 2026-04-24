@@ -17,8 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AnimatedButton from '../../components/animations/AnimatedButton';
 import AnimatedCard from '../../components/animations/AnimatedCard';
-import Footer from '../../components/Layout/Footer';
-import PublicNavbar from '../../components/Layout/PublicNavbar';
+import Footer from '../../components/layout/Footer';
+import PublicNavbar from '../../components/layout/PublicNavbar';
 
 const FloatingIcon = ({ icon: Icon, delay, initialX, initialY, color }) => (
     <motion.div
@@ -65,14 +65,10 @@ const Login = () => {
         setLoading(true);
         setError('');
 
-        const result = await login(formData.email, formData.password);
+        const result = await login(formData.email, formData.password, 'staff');
 
         if (result.success) {
-            if (result.user.role === 'admin') {
-                navigate('/admin');
-            } else {
-                navigate('/dashboard');
-            }
+            navigate('/dashboard');
         } else {
             setError(result.message);
         }

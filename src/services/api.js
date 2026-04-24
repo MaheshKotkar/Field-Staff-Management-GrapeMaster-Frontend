@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api'
+        : 'https://field-staff-management-grapemaster-1in1.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -20,5 +22,17 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+export const uploadImage = async (file, visitId) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('visitId', visitId);
+
+    return await api.post('/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
 
 export default api;

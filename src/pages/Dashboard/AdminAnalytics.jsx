@@ -1,5 +1,4 @@
-import React from 'react';
-import { Box, Typography, Tooltip } from '@mui/material';
+import { Box, Typography, Tooltip, Fade } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const BarItem = ({ label, value, max, color, delay }) => {
@@ -20,12 +19,8 @@ const BarItem = ({ label, value, max, color, delay }) => {
                         ],
                     },
                 }}
-                TransitionComponent={motion.div}
-                TransitionProps={{
-                    initial: { opacity: 0, scale: 0.5 },
-                    animate: { opacity: 1, scale: 1 },
-                    exit: { opacity: 0, scale: 0.5 }
-                }}
+                TransitionComponent={Fade}
+                TransitionProps={{ timeout: 600 }}
             >
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column-reverse', height: 200, bgcolor: 'grey.50', borderRadius: 2, overflow: 'hidden' }}>
                     <motion.div
@@ -47,27 +42,42 @@ const BarItem = ({ label, value, max, color, delay }) => {
     );
 };
 
-const AdminAnalytics = () => {
-    const data = [
-        { label: 'Mon', value: 45, color: '#64dd17' },
-        { label: 'Tue', value: 80, color: '#7c4dff' },
-        { label: 'Wed', value: 65, color: '#64dd17' },
-        { label: 'Thu', value: 90, color: '#7c4dff' },
-        { label: 'Fri', value: 55, color: '#64dd17' },
-        { label: 'Sat', value: 30, color: '#64dd17' },
-        { label: 'Sun', value: 20, color: '#64dd17' },
-    ];
+const AdminAnalytics = ({ visits = [] }) => {
+    // Group visits by day of week for the last 7 days
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
 
-    const max = Math.max(...data.map(d => d.value));
+    // Initialize last 7 days with 0
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        last7Days.push({
+            label: days[d.getDay()],
+            fullDate: d.toDateString(),
+            value: 0,
+            color: i % 2 === 0 ? '#64dd17' : '#7c4dff'
+        });
+    }
+
+    // Fill with actual data
+    visits.forEach(visit => {
+        const visitDate = new Date(visit.createdAt).toDateString();
+        const dayMatch = last7Days.find(d => d.fullDate === visitDate);
+        if (dayMatch) {
+            dayMatch.value += 1;
+        }
+    });
+
+    const max = Math.max(...last7Days.map(d => d.value), 5); // Minimum max of 5 for better scale
 
     return (
         <Box sx={{ py: 2 }}>
             <Box display="flex" justifyContent="space-between" alignItems="flex-end" sx={{ height: 240, gap: 1 }}>
-                {data.map((item, index) => (
+                {last7Days.map((item, index) => (
                     <BarItem
-                        key={item.label}
+                        key={index}
                         {...item}
-                        max={max + 10}
+                        max={max + 1}
                         delay={index * 0.1}
                     />
                 ))}

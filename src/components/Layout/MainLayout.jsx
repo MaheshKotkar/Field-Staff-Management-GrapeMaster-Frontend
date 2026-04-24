@@ -9,17 +9,24 @@ const MainLayout = ({ children }) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{
+            display: 'flex',
+            height: '100vh',
+            bgcolor: 'background.default',
+            overflow: 'hidden'
+        }}>
             {!isMobile && <Sidebar />}
 
             <Box
                 sx={{
                     flexGrow: 1,
+                    flexShrink: 1,
+                    width: '100%',
                     pb: isMobile ? '80px' : 0,
-                    minHeight: '100vh',
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    overflow: 'auto',
+                    overflowY: 'auto',
                     position: 'relative'
                 }}
             >

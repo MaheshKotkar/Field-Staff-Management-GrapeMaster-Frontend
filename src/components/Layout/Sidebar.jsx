@@ -16,7 +16,9 @@ import {
     Settings,
     ChevronLeft,
     ChevronRight,
-    LogOut
+    LogOut,
+    ClipboardCheck,
+    ClipboardList
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -82,24 +84,44 @@ const NavItem = ({ icon: Icon, label, path, expanded, active }) => {
 const Sidebar = () => {
     const [expanded, setExpanded] = useState(true);
     const location = useLocation();
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
 
     const menuItems = [
         { icon: Home, label: 'Dashboard', path: '/dashboard' },
         { icon: Users, label: 'Farmers', path: '/farmers' },
         { icon: Calendar, label: 'Visits', path: '/visits' },
-        { icon: MapPin, label: 'Territory', path: '/map' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 
-    // Add Admin items if user is admin
-    if (user?.role === 'admin') {
-        menuItems.splice(4, 0, { icon: BarChart3, label: 'Admin Portal', path: '/admin' });
+    if (user?.role === 'staff') {
+        menuItems.push({ icon: ClipboardCheck, label: 'Daily Summary', path: '/daily-summary' });
     }
+
+    if (user?.role === 'admin') {
+        menuItems.push({ icon: BarChart3, label: 'Admin Portal', path: '/admin' });
+        menuItems.push({ icon: ClipboardList, label: 'Daily Reports', path: '/admin/reports' });
+    }
+
+    menuItems.push({ icon: Settings, label: 'Settings', path: '/settings' });
+
+    const handleLogout = () => {
+        const isAdmin = user?.role === 'admin';
+        if (isAdmin) {
+            navigate('/');
+            setTimeout(() => logout(), 0);
+        } else {
+            logout();
+            navigate('/login');
+        }
+    };
 
     return (
         <motion.div
-            animate={{ width: expanded ? 240 : 80 }}
+            animate={{
+                width: expanded ? 240 : 80,
+                minWidth: expanded ? 240 : 80,
+                maxWidth: expanded ? 240 : 80
+            }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             style={{
                 backgroundColor: 'white',
@@ -109,7 +131,10 @@ const Sidebar = () => {
                 top: 0,
                 display: 'flex',
                 flexDirection: 'column',
-                overflowX: 'hidden'
+                overflowX: 'hidden',
+                overflowY: 'auto', // Enable vertical scrolling
+                flexShrink: 0,
+                zIndex: 1000
             }}
         >
             <Box sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', justifyContent: expanded ? 'flex-start' : 'center', gap: 2 }}>
@@ -143,13 +168,41 @@ const Sidebar = () => {
             </Box>
 
             <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9' }}>
-                <NavItem
-                    icon={LogOut}
-                    label="Logout"
-                    path="/login"
-                    expanded={expanded}
-                    active={false}
-                />
+                <Box sx={{ position: 'relative', px: 2, mb: 1 }}>
+                    <motion.div
+                        whileHover={{ x: expanded ? 4 : 0 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <IconButton
+                            onClick={handleLogout}
+                            sx={{
+                                width: '100%',
+                                borderRadius: 3,
+                                justifyContent: expanded ? 'flex-start' : 'center',
+                                gap: 2,
+                                color: 'text.secondary',
+                                '&:hover': {
+                                    bgcolor: 'grey.100',
+                                    color: 'error.main',
+                                },
+                                py: 1.5
+                            }}
+                        >
+                            <motion.div whileHover={{ scale: 1.2 }}>
+                                <LogOut size={22} />
+                            </motion.div>
+                            {expanded && (
+                                <motion.span
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    style={{ fontSize: '14px', fontWeight: 600 }}
+                                >
+                                    Logout
+                                </motion.span>
+                            )}
+                        </IconButton>
+                    </motion.div>
+                </Box>
             </Box>
         </motion.div>
     );

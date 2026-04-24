@@ -7,7 +7,7 @@ import {
     useTheme
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Home, Users, Calendar, MapPin, BarChart3 } from 'lucide-react';
+import { Home, Users, Calendar, BarChart3, ClipboardCheck, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -15,14 +15,24 @@ const MobileBottomNavigation = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+        const isAdmin = user?.role === 'admin';
+        if (isAdmin) {
+            navigate('/');
+            setTimeout(() => logout(), 0);
+        } else {
+            logout();
+            navigate('/login');
+        }
+    };
 
     const getValue = () => {
         if (location.pathname.includes('dashboard')) return 0;
         if (location.pathname.includes('farmers')) return 1;
         if (location.pathname.includes('visits')) return 2;
         if (location.pathname.includes('admin')) return 3;
-        if (location.pathname.includes('map')) return 4;
         return 0;
     };
 
@@ -32,11 +42,15 @@ const MobileBottomNavigation = () => {
         { icon: Calendar, label: 'Visits', path: '/visits' },
     ];
 
+    if (user?.role === 'staff') {
+        menuItems.push({ icon: ClipboardCheck, label: 'EOD', path: '/daily-summary' });
+    }
+
     if (user?.role === 'admin') {
         menuItems.push({ icon: BarChart3, label: 'Admin', path: '/admin' });
     }
 
-    menuItems.push({ icon: MapPin, label: 'Map', path: '/map' });
+    menuItems.push({ icon: LogOut, label: 'Logout', path: 'logout' });
 
     return (
         <Paper
@@ -60,7 +74,12 @@ const MobileBottomNavigation = () => {
                 showLabels
                 value={getValue()}
                 onChange={(event, newValue) => {
-                    navigate(menuItems[newValue].path);
+                    const item = menuItems[newValue];
+                    if (item.label === 'Logout') {
+                        handleLogout();
+                    } else {
+                        navigate(item.path);
+                    }
                 }}
                 sx={{ bgcolor: 'transparent', height: 70 }}
             >

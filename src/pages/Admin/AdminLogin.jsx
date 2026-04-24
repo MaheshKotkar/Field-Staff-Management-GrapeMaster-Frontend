@@ -6,50 +6,23 @@ import {
     TextField,
     InputAdornment,
     IconButton,
-    Link,
     useTheme,
     Alert,
     CircularProgress
 } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Leaf, Grape, Mail, Lock, Eye, EyeOff, ArrowRight, User, ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight, ChevronLeft, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AnimatedButton from '../../components/animations/AnimatedButton';
 import AnimatedCard from '../../components/animations/AnimatedCard';
-import Footer from '../../components/layout/Footer';
-import PublicNavbar from '../../components/layout/PublicNavbar';
 
-const FloatingIcon = ({ icon: Icon, delay, initialX, initialY, color }) => (
-    <motion.div
-        initial={{ x: initialX, y: initialY, opacity: 0 }}
-        animate={{
-            y: [initialY, initialY - 40, initialY],
-            opacity: [0.2, 0.4, 0.2],
-            rotate: [0, 15, -15, 0]
-        }}
-        transition={{
-            duration: 8,
-            delay,
-            repeat: Infinity,
-            ease: "easeInOut"
-        }}
-        style={{
-            position: 'absolute',
-            color,
-            zIndex: 0
-        }}
-    >
-        <Icon size={48} strokeWidth={1.5} />
-    </motion.div>
-);
-
-const Register = () => {
+const AdminLogin = () => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { register } = useAuth();
+    const { login } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -63,19 +36,13 @@ const Register = () => {
         setLoading(true);
         setError('');
 
-        if (!formData.name || !formData.email || !formData.password) {
-            setError('Please fill in all fields');
-            setLoading(false);
-            return;
-        }
-
-        const result = await register(formData.name, formData.email, formData.password);
+        const result = await login(formData.email, formData.password, 'admin');
 
         if (result.success) {
             if (result.user.role === 'admin') {
                 navigate('/admin');
             } else {
-                navigate('/dashboard');
+                setError('Access denied. You do not have administrator privileges.');
             }
         } else {
             setError(result.message);
@@ -84,13 +51,7 @@ const Register = () => {
     };
 
     return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-        >
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Box
                 sx={{
                     flex: 1,
@@ -104,16 +65,59 @@ const Register = () => {
                     overflow: 'hidden'
                 }}
             >
-                <PublicNavbar showActions={false} />
                 {/* Floating Background Decorations */}
-                <FloatingIcon icon={Leaf} delay={0} initialX="10%" initialY="20%" color={theme.palette.primary.light} />
-                <FloatingIcon icon={Grape} delay={2} initialX="85%" initialY="15%" color={theme.palette.secondary.light} />
-                <FloatingIcon icon={Leaf} delay={4} initialX="80%" initialY="70%" color={theme.palette.primary.main} />
-                <FloatingIcon icon={Grape} delay={1} initialX="15%" initialY="75%" color={theme.palette.secondary.main} />
+                <Box
+                    component={motion.div}
+                    animate={{
+                        y: [0, -40, 0],
+                        opacity: [0.2, 0.4, 0.2],
+                        rotate: [0, 15, -15, 0]
+                    }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    sx={{ position: 'absolute', left: '10%', top: '20%', color: theme.palette.primary.light, zIndex: 0 }}
+                >
+                    <ShieldCheck size={48} strokeWidth={1.5} />
+                </Box>
+                <Box
+                    component={motion.div}
+                    animate={{
+                        y: [0, -40, 0],
+                        opacity: [0.2, 0.4, 0.2],
+                        rotate: [0, 15, -15, 0]
+                    }}
+                    transition={{ duration: 8, delay: 2, repeat: Infinity, ease: "easeInOut" }}
+                    sx={{ position: 'absolute', left: '85%', top: '15%', color: theme.palette.secondary.light, zIndex: 0 }}
+                >
+                    <LayoutDashboard size={48} strokeWidth={1.5} />
+                </Box>
+                <Box
+                    component={motion.div}
+                    animate={{
+                        y: [0, -40, 0],
+                        opacity: [0.2, 0.4, 0.2],
+                        rotate: [0, 15, -15, 0]
+                    }}
+                    transition={{ duration: 8, delay: 4, repeat: Infinity, ease: "easeInOut" }}
+                    sx={{ position: 'absolute', left: '80%', top: '70%', color: theme.palette.primary.main, zIndex: 0 }}
+                >
+                    <ShieldCheck size={48} strokeWidth={1.5} />
+                </Box>
+                <Box
+                    component={motion.div}
+                    animate={{
+                        y: [0, -40, 0],
+                        opacity: [0.2, 0.4, 0.2],
+                        rotate: [0, 15, -15, 0]
+                    }}
+                    transition={{ duration: 8, delay: 1, repeat: Infinity, ease: "easeInOut" }}
+                    sx={{ position: 'absolute', left: '15%', top: '75%', color: theme.palette.secondary.main, zIndex: 0 }}
+                >
+                    <LayoutDashboard size={48} strokeWidth={1.5} />
+                </Box>
 
                 <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
                     <motion.div
-                        initial={{ x: -100, opacity: 0 }}
+                        initial={{ x: 100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
@@ -148,51 +152,27 @@ const Register = () => {
                                             borderColor: 'primary.light'
                                         }}
                                     >
-                                        <Box component="img" src="/grape_master_logo.png" sx={{ width: 48, height: 48, objectFit: 'contain' }} />
+                                        <ShieldCheck size={40} color={theme.palette.primary.main} />
                                     </Box>
                                 </motion.div>
                                 <Typography variant="h4" fontWeight="700" color="text.primary" gutterBottom>
-                                    Join Grape Master
+                                    Admin Portal
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
-                                    Start managing your farm visits today.
+                                    Secure enterprise access only.
                                 </Typography>
                             </Box>
 
-                            <AnimatePresence>
-                                {error && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        style={{ marginBottom: '16px' }}
-                                    >
-                                        <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            {error && (
+                                <Box mb={2}>
+                                    <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>
+                                </Box>
+                            )}
 
                             <Box component="form" onSubmit={handleSubmit} noValidate>
                                 <TextField
                                     fullWidth
-                                    label="Full Name"
-                                    name="name"
-                                    autoComplete="name"
-                                    margin="normal"
-                                    required
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <User size={20} color={theme.palette.text.secondary} />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Email Address"
+                                    label="Admin Email"
                                     name="email"
                                     autoComplete="email"
                                     margin="normal"
@@ -209,10 +189,10 @@ const Register = () => {
                                 />
                                 <TextField
                                     fullWidth
-                                    label="Password"
+                                    label="Security Password"
                                     name="password"
                                     type={showPassword ? 'text' : 'password'}
-                                    autoComplete="new-password"
+                                    autoComplete="current-password"
                                     margin="normal"
                                     required
                                     value={formData.password}
@@ -239,25 +219,15 @@ const Register = () => {
                                     size="large"
                                     type="submit"
                                     disabled={loading}
-                                    color="secondary"
                                     endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <ArrowRight size={20} />}
-                                    sx={{ py: 1.5, mb: 3, mt: 3 }}
+                                    sx={{ py: 1.5, mt: 3, mb: 3 }}
                                 >
-                                    {loading ? 'Creating Account...' : 'Create Account'}
+                                    {loading ? 'Authorizing...' : 'Authorize Access'}
                                 </AnimatedButton>
 
-                                <Box textAlign="center">
-                                    <Typography variant="body2" color="text.secondary">
-                                        Already have an account?{' '}
-                                        <Link
-                                            component="button"
-                                            type="button"
-                                            onClick={() => navigate('/login')}
-                                            color="primary"
-                                            sx={{ fontWeight: 700, textDecoration: 'none', border: 'none', background: 'none', p: 0, cursor: 'pointer' }}
-                                        >
-                                            Sign In
-                                        </Link>
+                                <Box textAlign="center" pt={2} borderTop="1px solid" borderColor="divider">
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700 }}>
+                                        Enterprise Security Protocol
                                     </Typography>
                                 </Box>
                             </Box>
@@ -265,9 +235,8 @@ const Register = () => {
                     </motion.div>
                 </Container>
             </Box>
-            <Footer />
         </Box>
     );
 };
 
-export default Register;
+export default AdminLogin;

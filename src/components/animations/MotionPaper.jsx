@@ -15,6 +15,10 @@ const MotionPaper = forwardRef(({
     onExited,
     onExiting,
     ownerState,
+    direction,
+    appear,
+    enter,
+    exit,
     ...props
 }, ref) => (
     <motion.div ref={ref} {...props} />
